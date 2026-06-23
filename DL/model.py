@@ -312,7 +312,7 @@ class ImageEncoder(nn.Module):
             if model_name == "swin_molscribe" and pretrained:
                 pretrain_path = "../image_encoder.pth"
                 pretrained_dict = torch.load(pretrain_path, map_location=torch.device('cpu'))
-                print("load ckpt from pretrained image encoder)
+                print("load ckpt from pretrained image encoder")
 
                 self.transformer.load_state_dict(pretrained_dict, strict=False)
 
