@@ -1,2 +1,2 @@
-image_folder: "data/cycle_peptide/cycle_peptide_image_png"
+image_folder: "/content/MultiCycPermeadata/data/"
 augmentation: True
