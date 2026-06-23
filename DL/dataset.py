@@ -66,7 +66,7 @@ class CropWhite(A.DualTransform):
     def apply(self, img, crop_top=0, crop_bottom=0, crop_left=0, crop_right=0, **params):
         height, width, _ = img.shape
         img = img[crop_top:height - crop_bottom, crop_left:width - crop_right]
-        img = A.augmentations.pad_with_params(
+        img = cv2.copyMakeBorder(
             img, self.pad, self.pad, self.pad, self.pad, border_mode=cv2.BORDER_CONSTANT, value=self.value)
         return img
 
