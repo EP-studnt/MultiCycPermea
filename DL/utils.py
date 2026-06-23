@@ -16,17 +16,18 @@ import ast
 from sklearn.model_selection import KFold
 import torch.nn as nn
 import torch.optim as optim
-from tdc import Evaluator
 from transformers import RobertaTokenizerFast
 import torch.nn.functional as F
+from sklearn.metrics import mean_squared_error, r2_score as _r2, mean_absolute_error
+from scipy.stats import pearsonr as _pearsonr, spearmanr as _spearmanr
 
 eps = 1e-8
-mse_evaluator = Evaluator(name='MSE')
-R2_evaluator = Evaluator(name='R2')
-pcc_evaluator = Evaluator(name='PCC')
-scc_evaluator = Evaluator(name='Spearman')
-rmse_evaluator = Evaluator(name='RMSE')
-mae_evaluator = Evaluator(name='MAE')
+def mse_evaluator(y, yp):   return float(mean_squared_error(y, yp))
+def R2_evaluator(y, yp):    return float(_r2(y, yp))
+def pcc_evaluator(y, yp):   return float(_pearsonr(y, yp)[0])
+def scc_evaluator(y, yp):   return float(_spearmanr(y, yp)[0])
+def rmse_evaluator(y, yp):  return float(mean_squared_error(y, yp)**0.5)
+def mae_evaluator(y, yp):   return float(mean_absolute_error(y, yp))
 
 
 def get_fingerprint(smi):
