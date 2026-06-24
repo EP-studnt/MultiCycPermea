@@ -188,6 +188,14 @@ def main():
 
     # initialize_model_parameters(model)
     model.to(device)
+
+    import glob
+    checkpoints = sorted(glob.glob('/content/drive/MyDrive/MultiCycPermea/checkpoints/epoch_*.pth'))
+    if checkpoints:
+        latest = checkpoints[-1]
+        checkpoint = torch.load(latest, map_location=device)
+        model.load_state_dict(checkpoint['model_state_dict'])
+        print(f"Resumed from {latest} (epoch {checkpoint['epoch']})")
     MSE_criterion = nn.MSELoss()
 
     text_optimizer, image_optimizer, other_optimizer = define_optimizer(model, text_model_config, image_model_config,

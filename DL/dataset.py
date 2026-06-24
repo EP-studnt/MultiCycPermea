@@ -13,6 +13,8 @@ from rdkit import Chem
 import os
 
 import cv2
+from rdkit import RDLogger
+RDLogger.DisableLog("rdApp.warning")
 import albumentations as A
 from albumentations.pytorch import ToTensorV2
 from rdkit import Chem
@@ -67,7 +69,7 @@ class CropWhite(A.DualTransform):
         height, width, _ = img.shape
         img = img[crop_top:height - crop_bottom, crop_left:width - crop_right]
         img = cv2.copyMakeBorder(
-            img, self.pad, self.pad, self.pad, self.pad, border_mode=cv2.BORDER_CONSTANT, value=self.value)
+            img, self.pad, self.pad, self.pad, self.pad, borderType=cv2.BORDER_CONSTANT, value=self.value)
         return img
 
     def apply_to_keypoint(self, keypoint, crop_top=0, crop_bottom=0, crop_left=0, crop_right=0, **params):
@@ -105,7 +107,7 @@ def get_transforms(input_size, augment=True, debug=False):
     trans_list = []
     if augment:
         trans_list += [
-            A.SafeRotate(limit=90, border_mode=cv2.BORDER_CONSTANT, value=(255, 255, 255)),
+            A.SafeRotate(limit=90, borderType=cv2.BORDER_CONSTANT, value=(255, 255, 255)),
             CropWhite(pad=5),
             A.CropAndPad(percent=[-0.01, 0.00], keep_size=False, p=0.5),
             A.Downscale(scale_min=0.2, scale_max=0.5, interpolation=3),
@@ -193,7 +195,7 @@ class SMILESDataset(Dataset):
 
 
 def get_similarity_matrix():
-    similarity_matrix_df = pd.read_pickle('KG.pkl')
+    similarity_matrix_df = pd.read_pickle('/content/MultiCycPermea/DL/KG.pkl')
     return similarity_matrix_df
 
 

@@ -326,31 +326,13 @@ class ImageEncoder(nn.Module):
             raise NotImplemented
 
     def swin_forward(self, transformer, x):
-        x = transformer.patch_embed(x)
-        if transformer.absolute_pos_embed is not None:
-            x = x + transformer.absolute_pos_embed
-        x = transformer.pos_drop(x)
-
-        def layer_forward(layer, x, hiddens):
-            for blk in layer.blocks:
-                if not torch.jit.is_scripting() and layer.use_checkpoint:
-                    x = torch.utils.checkpoint.checkpoint(blk, x)
-                else:
-                    x = blk(x)
-            H, W = layer.input_resolution
-            B, L, C = x.shape
-            hiddens.append(x.view(B, H, W, C))
-            if layer.downsample is not None:
-                x = layer.downsample(x)
-            return x, hiddens
-
-        hiddens = []
-        for layer in transformer.layers:
-            x, hiddens = layer_forward(layer, x, hiddens)
-        x = transformer.norm(x)  # B L C
-        hiddens[-1] = x.view_as(hiddens[-1])
-        # torch.save(hiddens, 'attn.pt')
-        return x, hiddens
+        features = transformer.forward_features(x)
+        if features.dim() == 4:
+            B, H, W, C = features.shape
+            features = features.view(B, H * W, C)
+        elif features.dim() == 2:
+            features = features.unsqueeze(1)
+        return features, []
 
     def forward(self, x, refs=None):
         if self.model_type in ['resnet', 'efficientnet']:

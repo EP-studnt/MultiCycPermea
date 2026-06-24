@@ -1,2 +1,2 @@
-image_folder: "/content/MultiCycPermeadata/data/"
+image_folder: "/content/MultiCycPermea/data/generate_images"
 augmentation: True

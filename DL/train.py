@@ -84,6 +84,7 @@ def train(model, train_loader, test_loader, val_loader, text_optimizer, image_op
         val_loss = 0
         all_y_true = []
         all_y_pred = []
+        context_manager = model.ema_scope(context="ema version") if hasattr(model, "use_ema") and model.use_ema else nullcontext
         with context_manager and torch.no_grad():
             for batch_idx, (data, target, length, image, fg, weight,_) in enumerate(tqdm(val_loader, desc="Val batches")):
                 data = data.to(device)
@@ -143,5 +144,12 @@ def train(model, train_loader, test_loader, val_loader, text_optimizer, image_op
         writer.add_scalar('test mae', test_mae, epoch + 1)
         writer.add_scalar('test pcc', test_pearsonr, epoch + 1)
         writer.add_scalar('test scc', test_spearmanr, epoch + 1)
+
+        if (epoch + 1) % 10 == 0:
+            import os
+            os.makedirs('/content/drive/MyDrive/MultiCycPermea/checkpoints', exist_ok=True)
+            torch.save({'epoch': epoch + 1, 'model_state_dict': model.state_dict()},
+                       f'/content/drive/MyDrive/MultiCycPermea/checkpoints/epoch_{epoch+1}.pth')
+            print(f"Checkpoint saved: epoch_{epoch+1}.pth")
 
         
